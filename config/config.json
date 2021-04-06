@@ -1,0 +1,5 @@
+{
+  "tz": "Asia/Yekaterinburg",
+  "logPath": "logs/node-puppeteer.log",
+  "screenPath": "runtime/screenshot.png"
+}

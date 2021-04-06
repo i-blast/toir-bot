@@ -1,0 +1,20 @@
+version: '3'
+
+services:
+    install:
+        image: ${NODE_IMAGE}
+        volumes:
+            - ../:/opt
+        working_dir: /opt
+        command: |
+            bash -c "
+            function install()
+            {
+              rm -f package-lock.json
+              rm -rf node_modules
+              npm i
+              rm -rf runtime
+              chmod 777 runtime -R
+            }
+            install || exit 0
+            "

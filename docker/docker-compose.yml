@@ -1,0 +1,18 @@
+version: '3'
+
+services:
+    telebot:
+        image: ${NODE_IMAGE}
+        volumes:
+            - ../:/opt:cached
+            - ../logs:/opt/logs:cached
+        working_dir: /opt
+        environment:
+            BOT_TOKEN: ${BOT_TOKEN}
+        command: /usr/bin/dumb-init -- node app.js
+        deploy:
+            resources:
+                limits:
+                    memory: 400M
+            restart_policy:
+                condition: on-failure
