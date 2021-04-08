@@ -9,7 +9,13 @@ async function startBot() {
         // const screenPath = config.get('screenPath');
 
         const ordersData = await toirParser.getOrdersData();
-        await ctx.reply(ordersData);
+        let ordersDataToReply = ordersData;
+        while (ordersDataToReply.length > 0) {
+            // Шлем по 5 заявок.
+            const messagePart = ordersDataToReply.splice(0, 5);
+            await ctx.reply(JSON.stringify(messagePart, null, 2));
+        }
+
         // await ctx.replyWithDocument({
         //     source: `./${screenPath}`,
         // }, {
