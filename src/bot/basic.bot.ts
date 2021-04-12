@@ -1,8 +1,8 @@
-const logger = require('../utility/logger.js');
-const {Telegraf} = require('telegraf');
+import logger from '../util/logger';
+import { Telegraf } from 'telegraf';
 
-async function startBot() {
-    const bot = new Telegraf(process.env.BOT_TOKEN);
+export async function startBot() {
+    const bot = new Telegraf(process.env.BOT_TOKEN || '');
 
     bot.start((ctx) => ctx.reply('Welcome'));
     bot.help((ctx) => ctx.reply('Send me a sticker'));
@@ -15,5 +15,3 @@ async function startBot() {
     process.once('SIGINT', () => bot.stop('SIGINT'));
     process.once('SIGTERM', () => bot.stop('SIGTERM'));
 }
-
-module.exports.startBot = startBot;

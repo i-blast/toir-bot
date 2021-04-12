@@ -9,7 +9,7 @@ services:
         working_dir: /opt
         environment:
             BOT_TOKEN: ${BOT_TOKEN}
-        command: /usr/bin/dumb-init -- node app.js
+        command: /usr/bin/dumb-init -- node app.ts
         deploy:
             resources:
                 limits:

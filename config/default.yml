@@ -1,0 +1,12 @@
+toir-bot:
+  service-name: toir-bot
+  logger:
+    message:
+      timestamp-pattern: 'YYYY-MM-DD HH:mm:ss:SSS'
+    console:
+      debug-level: debug
+    file:
+      debug-level: debug
+      path:
+        name: logs
+        timestamp-pattern: 'YYYY-MM-DD-HH-mm-ss-SSS'

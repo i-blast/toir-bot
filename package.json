@@ -1,18 +1,48 @@
 {
-  "name": "node-toir-bot",
-  "version": "0.0.1",
-  "description": "",
-  "main": "app.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "moment-timezone": "^0.5.27",
-    "nconf": "^0.11.2",
-    "playwright": "1.10.0",
-    "telegraf": "4.3.0",
-    "winston": "3.3.3"
-  }
+    "name": "node-toir-bot",
+    "version": "0.1.0",
+    "description": "",
+    "main": "dist/app.js",
+    "scripts": {
+        "build": "npm run clean && tsc",
+        "start": "node .",
+        "prestart": "npm run build",
+        "server:watch": "ts-node-dev --respawn --transpile-only src/app.ts",
+        "lint": "eslint \"{src, test}/**/*.ts\" --fix",
+        "clean": "rimraf dist"
+    },
+    "author": "ilYa",
+    "private": true,
+    "license": "ISC",
+    "keywords": [],
+    "dependencies": {
+        "class-transformer": "0.4.0",
+        "config": "3.3.6",
+        "moment": "2.25.3",
+        "moment-timezone": "0.5.30",
+        "mongodb": "3.6.6",
+        "mongoose": "5.12.3",
+        "playwright": "1.10.0",
+        "reflect-metadata": "0.1.13",
+        "telegraf": "4.3.0",
+        "winston": "3.3.3"
+    },
+    "devDependencies": {
+        "@types/config": "0.0.38",
+        "@types/moment-timezone": "0.5.30",
+        "@types/mongodb": "3.6.12",
+        "@types/node": "14.14.37",
+        "@typescript-eslint/eslint-plugin": "4.21.0",
+        "@typescript-eslint/parser": "4.21.0",
+        "cross-env": "7.0.3",
+        "eslint": "7.24.0",
+        "eslint-config-prettier": "8.1.0",
+        "eslint-plugin-import": "2.22.1",
+        "eslint-plugin-prettier": "3.3.1",
+        "prettier": "2.2.1",
+        "ts-loader": "8.1.0",
+        "ts-node-dev": "1.1.6",
+        "tsconfig-paths": "3.9.0",
+        "typescript": "4.2.4"
+    }
 }
