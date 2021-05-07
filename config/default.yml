@@ -10,3 +10,5 @@ toir-bot:
       path:
         name: logs
         timestamp-pattern: 'YYYY-MM-DD-HH-mm-ss-SSS'
+  database:
+    url: 'mongodb://localhost:27017/toir_db'

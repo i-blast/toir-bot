@@ -1,9 +1,14 @@
-import { ToirDriver } from './toir.driver';
+import { ToirParser } from './toir.parser';
 import logger from '../util/logger';
 import { Telegraf } from 'telegraf';
 
+/**
+ * Telegram-бот, анализирующий заявки в системе ГлазТоира.
+ *
+ * Парсит html-таблицу с заявками, сохраняет новые заявки в своей БД и рассылает уведомления о новых заявках.
+ */
 export class ToirBot {
-    private driver?: ToirDriver;
+    private parser?: ToirParser;
 
     /**
      * Запуск сервиса.
@@ -11,16 +16,16 @@ export class ToirBot {
     public async startBot() {
         const bot = new Telegraf(`${process.env.BOT_TOKEN}`);
 
-        this.driver = new ToirDriver();
+        this.parser = new ToirParser();
         try {
-            await this.driver.configure();
+            await this.parser.configure();
         } catch (exc) {
-            logger.error('Error while configuring web driver', exc);
+            logger.error('Error while configuring web parser', exc);
             throw exc;
         }
         logger.debug('Driver configured');
         try {
-            await this.driver.goToOrdersTable();
+            await this.parser.goToOrdersTable();
         } catch (exc) {
             logger.error('Error while navigating to orders table view', exc);
             throw exc;
@@ -29,9 +34,9 @@ export class ToirBot {
 
         bot.command('fetch', async (ctx) => {
             // const screenPath = config.get('screenPath');
-            if (!this.driver) throw new Error('Web-driver broken');
+            if (!this.parser) throw new Error('Web-parser broken');
 
-            const ordersData = await this.driver.getOrdersData();
+            const ordersData = await this.parser.getOrdersData();
             logger.debug('Orders data fetched');
             const ordersDataToReply = ordersData;
             while (ordersDataToReply.length > 0) {

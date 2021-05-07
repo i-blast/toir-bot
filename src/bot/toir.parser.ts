@@ -1,13 +1,19 @@
 import { Browser, chromium, Page } from 'playwright';
 import logger from '../util/logger';
-import Order from '../model/toir/order/order';
+import { Order } from '../order/order';
+import OrderStatus from '../order/order.status';
 
-export class ToirDriver {
+/**
+ * Парсер для системы ГлазТоира на основе chromium webdriver.
+ */
+export class ToirParser {
+    /** */
     private browser?: Browser;
+    /** */
     private page?: Page;
 
     /**
-     * Настройка web-драйвера.
+     * Настройка парсера.
      */
     public async configure(): Promise<void> {
         // Конфигурирование chromium драйвера
@@ -32,26 +38,26 @@ export class ToirDriver {
     public async getOrdersData(): Promise<Array<Order>> {
         // const screenPath = config.get('screenPath');
         // Парсинг таблицы с данными
-        if (!this.page) throw new Error('ToirDriver is in an inconsistent state.');
+        if (!this.page) throw new Error('Parser is in an inconsistent state.');
         const TABLE_ROWS_SELECTOR = 'div[id$="_Список"].grid div.gridBody > .gridLine';
         const tableData = await this.page.$$eval(TABLE_ROWS_SELECTOR, (gridRows: (SVGElement | HTMLElement)[]) => {
             return gridRows.map((row: SVGElement | HTMLElement) => {
                 return {
-                    priority: (row.children[0] as HTMLElement).innerText,
-                    requestObject: (row.children[1] as HTMLElement).innerText,
-                    requestNumber: (row.children[2] as HTMLElement).innerText,
-                    dateLimit: (row.children[3] as HTMLElement).innerText,
-                    date: (row.children[4] as HTMLElement).innerText,
-                    dateCreated: (row.children[5] as HTMLElement).innerText,
-                    requestStatus: (row.children[6] as HTMLElement).innerText,
-                    vmsRequestNumber: (row.children[7] as HTMLElement).innerText,
-                    responsiblePerson: (row.children[8] as HTMLElement).innerText,
-                    sourceSystem: (row.children[9] as HTMLElement).innerText,
-                    branchOffice: (row.children[10] as HTMLElement).innerText,
+                    number: (row.children[2] as HTMLElement).innerText.trim(),
+                    status: OrderStatus.byTableValue((row.children[6] as HTMLElement).innerText.trim()),
+                    source: (row.children[9] as HTMLElement).innerText.trim(),
+                    object: (row.children[1] as HTMLElement).innerText.trim(),
+                    timestampLimit: new Date((row.children[3] as HTMLElement).innerText.trim()),
+                    timestampDetection: new Date((row.children[4] as HTMLElement).innerText.trim()),
+                    timestampCreated: new Date((row.children[5] as HTMLElement).innerText.trim()),
+                    vmsRequestNumber: (row.children[7] as HTMLElement).innerText.trim(),
+                    responsiblePerson: (row.children[8] as HTMLElement).innerText.trim(),
+                    branchOffice: (row.children[10] as HTMLElement).innerText.trim(),
+                    description: '',
                 } as Order;
             });
         });
-        logger.debug(`Orders number fetched: ${tableData.length}`);
+        logger.debug(`Orders fetched number: ${tableData.length}`);
         return tableData;
     }
 
@@ -59,7 +65,7 @@ export class ToirDriver {
      *  Переход к таблице с данными заявок.
      */
     public async goToOrdersTable(): Promise<void> {
-        if (!this.page) throw new Error('ToirDriver is in an inconsistent state.');
+        if (!this.page) throw new Error('Parser is in an inconsistent state.');
         await this.page.goto(`${process.env.SERVICE_HOST}?sysver=${process.env.SYSTEM_VERSION}`);
         logger.debug('Http-basic auth ok.');
         await this.login();
@@ -71,7 +77,7 @@ export class ToirDriver {
      *  Аутентификация через форму.
      */
     private async login(): Promise<void> {
-        if (!this.page) throw new Error('ToirDriver is in an inconsistent state.');
+        if (!this.page) throw new Error('Parser is in an inconsistent state.');
         await this.page.waitForSelector('#userName');
         await this.page.fill('#userName', `${process.env.FORM_LOGIN}`);
         await this.page.fill('#userPassword', `${process.env.FORM_PASSWORD}`);
@@ -80,7 +86,7 @@ export class ToirDriver {
     }
 
     private async goToOrders(): Promise<void> {
-        if (!this.page) throw new Error('ToirDriver is in an inconsistent state.');
+        if (!this.page) throw new Error('Parser is in an inconsistent state.');
         // Нажатие кнопки "Смета ремонта (Заявка на ремонт)"
         await this.page.waitForSelector('#themesCell_theme_1');
         await this.page.click('#themesCell_theme_1');
