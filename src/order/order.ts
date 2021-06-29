@@ -1,7 +1,9 @@
 import { getModelForClass, prop, queryMethod, ReturnModelType } from '@typegoose/typegoose';
-import OrderStatus from './order.status';
 import { AsQueryMethod } from '@typegoose/typegoose/lib/types';
+import OrderStatus from './order.status';
 import OrderSource, { OBJECT_AUDIT_NOTES_SECTION } from './order.source';
+import OrderPriority from './order.priority';
+import RepairType from './repair.type';
 
 /**
  *  Модель хранимой заявки на ремонт оборудования.
@@ -14,12 +16,19 @@ export class Order {
     /** Статус заявки. */
     @prop({
         required: true,
-        default: OrderStatus.ASSIGNED,
         type: String,
         get: (asString: string) => OrderStatus.byName(asString),
         set: (orderStatus: OrderStatus) => orderStatus.getName(),
     })
     public status!: OrderStatus;
+    /** Приоритет заявки. */
+    @prop({
+        required: true,
+        type: String,
+        get: (asString: string) => OrderPriority.byName(asString),
+        set: (orderPriority: OrderPriority) => orderPriority.getName(),
+    })
+    public priority!: OrderPriority;
     /** Источник заявки. */
     @prop({ required: true })
     public source!: string;
@@ -37,7 +46,7 @@ export class Order {
     public timestampCreated!: Date;
     /** Номер запроса. */
     @prop({ required: false })
-    public vmsRequestNumber?: string;
+    public requestNumber?: string;
     /** Ответственное лицо. */
     @prop({ required: true })
     public responsiblePerson!: string;
@@ -47,19 +56,30 @@ export class Order {
     /** Описание. */
     @prop({ required: true })
     public description!: string;
+    /** Тип ремонта. */
+    @prop({
+        required: true,
+        type: String,
+        get: (asString: string) => RepairType.byName(asString),
+        set: (repairType: RepairType) => repairType.getName(),
+    })
+    public repairType!: RepairType;
+
+    public constructor(init?: Partial<Order>) {
+        Object.assign(this, init);
+    }
 
     /**
-     * Определяет тип источника заявки.
-     *
      * @returns тип источника заявки
      */
     public getSource(): OrderSource {
+        // TODO выразить согласно постановке
         let source;
         if (this.description.includes(OBJECT_AUDIT_NOTES_SECTION)) {
             source = OrderSource.AUDIT;
         } else if (this.source.includes(OrderSource.GK_TASK.getTableValue())) {
             source = OrderSource.GK_TASK;
-        } else if (!this.vmsRequestNumber || this.vmsRequestNumber.length === 0) {
+        } else if (!this.requestNumber || this.requestNumber.length === 0) {
             source = OrderSource.AUTO;
         } else {
             source = OrderSource.COMMON;

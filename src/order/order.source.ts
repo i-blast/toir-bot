@@ -1,7 +1,7 @@
 /**
  * Источник заявки. Enum-like class.
  */
-class OrderSource {
+export default class OrderSource {
     /** Обычная. */
     static readonly COMMON = new OrderSource('COMMON', 'ВМС');
     /** Заявка-аудит. */
@@ -19,16 +19,16 @@ class OrderSource {
     ) {}
 
     /**
-     * @returns array of OrderSource instances in the order they're declared
+     * @returns массив констант OrderSource в порядке их объявления
      */
     static get values(): OrderSource[] {
         return [this.COMMON, this.AUDIT, this.AUTO, this.GK_TASK];
     }
 
     /**
-     * @param name the name to convert to Enum
-     * @throws RangeError, if a name that has no corresponding Enum value was passed
-     * @returns the matching Enum
+     * @param name имя константы
+     * @throws RangeError, если передано имя, для которого нет соответствующей константы
+     * @returns соответствующую константу
      */
     static byName(name: string): OrderSource {
         const value = (this as any)[name];
@@ -56,7 +56,7 @@ class OrderSource {
     }
 
     /**
-     * @returns JSON representation
+     * @returns JSON-представление
      */
     public toJSON() {
         return this.getName();
@@ -64,5 +64,3 @@ class OrderSource {
 }
 
 export const OBJECT_AUDIT_NOTES_SECTION = 'Замечания по итогу аудита объекта';
-
-export default OrderSource;

@@ -1,10 +1,9 @@
 import { Browser, chromium, Page } from 'playwright';
 import logger from '../util/logger';
 import { Order } from '../order/order';
-import OrderStatus from '../order/order.status';
 
 /**
- * Парсер для системы ГлазТоира на основе chromium webdriver.
+ * Парсер заявок на основе chromium webdriver.
  */
 export class ToirParser {
     /** */
@@ -27,34 +26,34 @@ export class ToirParser {
             width: 1280,
             height: 720,
         });
-
-        // await page.close();
-        // await browser.close();
     }
 
     /**
-     * Извлечение данных по заявкам из html таблицы.
+     * Извлечение данных по заявкам из html-таблицы.
      */
-    public async getOrdersData(): Promise<Array<Order>> {
+    public async getOrdersData(): Promise<Array<any>> {
         // const screenPath = config.get('screenPath');
         // Парсинг таблицы с данными
         if (!this.page) throw new Error('Parser is in an inconsistent state.');
         const TABLE_ROWS_SELECTOR = 'div[id$="_Список"].grid div.gridBody > .gridLine';
+        // TODO Надо типизировать
         const tableData = await this.page.$$eval(TABLE_ROWS_SELECTOR, (gridRows: (SVGElement | HTMLElement)[]) => {
             return gridRows.map((row: SVGElement | HTMLElement) => {
                 return {
                     number: (row.children[2] as HTMLElement).innerText.trim(),
-                    status: OrderStatus.byTableValue((row.children[6] as HTMLElement).innerText.trim()),
-                    source: (row.children[9] as HTMLElement).innerText.trim(),
+                    priority: (row.children[0] as HTMLElement).innerText.trim(),
+                    status: (row.children[6] as HTMLElement).innerText.trim(),
+                    source: (row.children[10] as HTMLElement).innerText.trim(),
                     object: (row.children[1] as HTMLElement).innerText.trim(),
-                    timestampLimit: new Date((row.children[3] as HTMLElement).innerText.trim()),
-                    timestampDetection: new Date((row.children[4] as HTMLElement).innerText.trim()),
-                    timestampCreated: new Date((row.children[5] as HTMLElement).innerText.trim()),
-                    vmsRequestNumber: (row.children[7] as HTMLElement).innerText.trim(),
+                    timestampLimit: (row.children[3] as HTMLElement).innerText.trim(),
+                    timestampDetection: (row.children[4] as HTMLElement).innerText.trim(),
+                    timestampCreated: (row.children[5] as HTMLElement).innerText.trim(),
+                    requestNumber: (row.children[7] as HTMLElement).innerText.trim(),
                     responsiblePerson: (row.children[8] as HTMLElement).innerText.trim(),
-                    branchOffice: (row.children[10] as HTMLElement).innerText.trim(),
-                    description: '',
-                } as Order;
+                    branchOffice: (row.children[11] as HTMLElement).innerText.trim(),
+                    description: (row.children[12] as HTMLElement).innerText.trim(),
+                    repairType: (row.children[9] as HTMLElement).innerText.trim(),
+                };
             });
         });
         logger.debug(`Orders fetched number: ${tableData.length}`);
@@ -82,7 +81,6 @@ export class ToirParser {
         await this.page.fill('#userName', `${process.env.FORM_LOGIN}`);
         await this.page.fill('#userPassword', `${process.env.FORM_PASSWORD}`);
         await this.page.click('#okButton');
-        // await page.screenshot({path: screenPath});
     }
 
     private async goToOrders(): Promise<void> {

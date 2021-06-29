@@ -10,7 +10,7 @@ export async function createOrder(order: CreateQuery<Order>) {
 
 /**
  * @param orderNumber - номер заявки
- * @returns заявку по уникальному номеру
+ * @returns заявку
  */
 export async function findOrderByNumber(orderNumber: string) {
     return OrderModel.findOne().findByNumber(orderNumber).exec();

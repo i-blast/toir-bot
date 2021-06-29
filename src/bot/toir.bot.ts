@@ -3,11 +3,11 @@ import logger from '../util/logger';
 import { Telegraf } from 'telegraf';
 
 /**
- * Telegram-бот, анализирующий заявки в системе ГлазТоира.
+ * Telegram-бот, анализирующий заявки.
  *
- * Парсит html-таблицу с заявками, сохраняет новые заявки в своей БД и рассылает уведомления о новых заявках.
+ * Парсит html-таблицу с заявками, сохраняет новые заявки в БД и рассылает уведомления о новых заявках.
  */
-export class ToirBot {
+class ToirBot {
     private parser?: ToirParser;
 
     /**
@@ -44,11 +44,6 @@ export class ToirBot {
                 await ctx.reply(JSON.stringify(messagePart, null, 4));
             }
             logger.debug('Orders data sent');
-            // await ctx.replyWithDocument({
-            //     source: `./${screenPath}`,
-            // }, {
-            //     caption: url
-            // });
         });
 
         await bot.launch();
