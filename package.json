@@ -20,7 +20,7 @@
         "class-transformer": "^0.5.1",
         "config": "^3.3.7",
         "moment": "^2.25.3",
-        "moment-timezone": "^0.5.30",
+        "moment-timezone": "^0.5.35",
         "mongoose": "^6.2.3",
         "playwright": "^1.19.2",
         "reflect-metadata": "^0.1.13",
